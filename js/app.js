@@ -4,13 +4,30 @@ da.location = {};
 
 $(function() {
 
+    da.art_icon = L.icon({
+        iconUrl: 'img/markers/pin.png',
+        iconSize: [15, 27],
+        iconAnchor: [8, 27],
+        popupAnchor: [0, -27]
+    });
+
+
+    da.art_layer = L.geoJson(null, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {icon: da.art_icon});
+        }
+    });
+
     da.map = L.map('map', {
         center: [39.7477, -104.9866],
         zoom: 14,
-        layers: [L.tileLayer('http://{s}.tiles.mapbox.com/v3/jcsanford.map-c7d5e9uz/{z}/{x}/{y}.png', {
-            subdomains: ['a', 'b', 'c', 'd'],
-            detectRetina: true
-        })]
+        layers: [
+            L.tileLayer('http://{s}.tiles.mapbox.com/v3/jcsanford.map-c7d5e9uz/{z}/{x}/{y}.png', {
+                subdomains: ['a', 'b', 'c', 'd'],
+                detectRetina: true
+            }),
+            da.art_layer
+        ]
     });
 
     da.updateArtInfo = function(context) {
@@ -56,7 +73,7 @@ $(function() {
             q: 'SELECT title,location,artist,year_installed,material,the_geom FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
         }
         $.getJSON('http://geojason.cartodb.com/api/v2/sql?' + $.param(params), function(data) {
-            console.log(JSON.stringify(data));
+            da.art_layer.addData(data);
         });
     }
 
