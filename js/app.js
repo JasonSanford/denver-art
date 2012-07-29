@@ -4,6 +4,17 @@ da.location = {};
 
 da.arts = {};
 
+da.fake_location = (function() {
+    // Since we only find art < 1km away, let's let users fake their location
+    if (window.location.href.indexOf('fake_location') > -1) {
+        return {
+            lat: 39.7477,
+            lng: -104.9866
+        };
+    }
+    return null;
+}());
+
 $(function() {
 
     da.art_icon = L.icon({
@@ -97,9 +108,13 @@ $(function() {
             lat = map_center.lat;
             lng = map_center.lng;
         }
+        if (da.fake_location) {
+            lat = da.fake_location.lat;
+            lng = da.fake_location.lng;
+        }
         var params = {
             format: 'geojson',
-            q: 'SELECT cartodb_id id,title,location,artist,year_installed,material,the_geom,st_distance(st_transform(st_setsrid(st_makepoint(-105.0161042,39.5735713),4326),3857),the_geom_webmercator) distance FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
+            q: 'SELECT t.id,t.title,t.location,t.artist,t.year_installed,t.material,t.the_geom,t.distance FROM (SELECT cartodb_id id,title,location,artist,year_installed,material,the_geom,st_distance(st_transform(st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326),3857),the_geom_webmercator) as distance FROM public_art) as t WHERE t.distance <= 1000 ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
         }
         $.getJSON('http://geojason.cartodb.com/api/v2/sql?' + $.param(params), function(data) {
             var i,
@@ -116,9 +131,9 @@ $(function() {
     }
 
     function locateSuccess(postion) {
-        var latLng = L.latLng(postion.coords.latitude, postion.coords.longitude);
-        da.location.lat = postion.coords.latitude;
-        da.location.lng = postion.coords.longitude;
+        var latLng = da.fake_location ? L.latLng(da.fake_location.lat, da.fake_location.lng) : L.latLng(postion.coords.latitude, postion.coords.longitude);
+        da.location.lat = da.fake_location ? da.fake_location.lat : postion.coords.latitude;
+        da.location.lng = da.fake_location ? da.fake_location.lng : postion.coords.longitude;
         if (da.location.circleMarker) {
             da.location.circleMarker.setLatLng(latLng);
             da.location.circle.setLatLng(latLng);
