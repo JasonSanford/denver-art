@@ -2,6 +2,8 @@ var da = window.da || {};
 
 da.location = {};
 
+da.arts = {};
+
 $(function() {
 
     da.art_icon = L.icon({
@@ -13,8 +15,15 @@ $(function() {
 
 
     da.art_layer = L.geoJson(null, {
-        pointToLayer: function (feature, latlng) {
+        pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {icon: da.art_icon});
+        },
+        onEachFeature: function(feature, layer) {
+            layer.on('click', function(event) {
+                da.updateArtInfo({
+                    art: feature.properties
+                });
+            });
         }
     });
 
@@ -24,10 +33,15 @@ $(function() {
         layers: [
             L.tileLayer('http://{s}.tiles.mapbox.com/v3/jcsanford.map-c7d5e9uz/{z}/{x}/{y}.png', {
                 subdomains: ['a', 'b', 'c', 'd'],
-                detectRetina: true
+                detectRetina: true,
+                maxZoom: 17
             }),
             da.art_layer
         ]
+    }).on('click', function(event) {
+        da.updateArtInfo({
+            art: null
+        });
     });
 
     da.updateArtInfo = function(context) {
@@ -35,10 +49,6 @@ $(function() {
     };
 
     da.art_info_template = Handlebars.compile($('#art_info_template').html());
-
-    da.updateArtInfo({
-        art: null
-    });
 
     if (navigator.geolocation) {
         da.watching = navigator.geolocation.watchPosition(locateSuccess, locateError, {
@@ -53,6 +63,9 @@ $(function() {
             navigator.geolocation.clearWatch(da.watching);
             da.map.removeLayer(da.location.circle);
         }
+        da.updateArtInfo({
+            art: null
+        });
         updateLocation();
     }, 5000);
 
@@ -70,10 +83,19 @@ $(function() {
         }
         var params = {
             format: 'geojson',
-            q: 'SELECT title,location,artist,year_installed,material,the_geom FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
+            q: 'SELECT cartodb_id id,title,location,artist,year_installed,material,the_geom FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
         }
         $.getJSON('http://geojason.cartodb.com/api/v2/sql?' + $.param(params), function(data) {
-            da.art_layer.addData(data);
+            var i,
+                len = data.features.length,
+                art;
+            if (data && data.features) {
+                for (i = 0; i < len; i++) {
+                    art = data.features[i];
+                    da.arts[art.properties.id] = art;
+                }
+                da.art_layer.addData(data);
+            }
         });
     }
 
