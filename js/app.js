@@ -19,27 +19,51 @@ $(function() {
 
     da.art_info_template = Handlebars.compile($('#art_info_template').html());
 
+    da.updateArtInfo({
+        art: null
+    });
+
     if (navigator.geolocation) {
         da.watching = navigator.geolocation.watchPosition(locateSuccess, locateError, {
             enableHighAccuracy: true,
             timeout: 10000,
             maximumAge: 0
         });
-
-        setTimeout(function() {
-            if (da.watching) {
-                navigator.geolocation.clearWatch(da.watching);
-                da.map.removeLayer(da.location.circle);
-            }
-        }, 5000);
     }
 
-    da.updateArtInfo({
-        art: null
-    });
+    setTimeout(function() {
+        if (da.watching) {
+            navigator.geolocation.clearWatch(da.watching);
+            da.map.removeLayer(da.location.circle);
+        }
+        updateLocation();
+    }, 5000);
+
+    function updateLocation() {
+        var lat,
+            lng,
+            map_center;
+        if (!(isNaN(da.location.lat) || isNaN(da.location.lng))) {
+            lat = da.location.lat;
+            lng = da.location.lng;
+        } else {
+            map_center = da.map.getCenter();
+            lat = map_center.lat;
+            lng = map_center.lng;
+        }
+        var params = {
+            format: 'geojson',
+            q: 'SELECT title,location,artist,year_installed,material,the_geom FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
+        }
+        $.getJSON('http://geojason.cartodb.com/api/v2/sql?' + $.param(params), function(data) {
+            console.log(JSON.stringify(data));
+        });
+    }
 
     function locateSuccess(postion) {
         var latLng = L.latLng(postion.coords.latitude, postion.coords.longitude);
+        da.location.lat = postion.coords.latitude;
+        da.location.lng = postion.coords.longitude;
         if (da.location.circleMarker) {
             da.location.circleMarker.setLatLng(latLng);
             da.location.circle.setLatLng(latLng);
