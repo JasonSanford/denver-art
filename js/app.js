@@ -99,7 +99,7 @@ $(function() {
         }
         var params = {
             format: 'geojson',
-            q: 'SELECT cartodb_id id,title,location,artist,year_installed,material,the_geom FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
+            q: 'SELECT cartodb_id id,title,location,artist,year_installed,material,the_geom,st_distance(st_transform(st_setsrid(st_makepoint(-105.0161042,39.5735713),4326),3857),the_geom_webmercator) distance FROM public_art ORDER BY the_geom <-> st_setsrid(st_makepoint(' + lng + ',' + lat + '),4326) LIMIT 10'
         }
         $.getJSON('http://geojason.cartodb.com/api/v2/sql?' + $.param(params), function(data) {
             var i,
