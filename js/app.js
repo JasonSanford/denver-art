@@ -20,9 +20,21 @@ $(function() {
         },
         onEachFeature: function(feature, layer) {
             layer.on('click', function(event) {
+                var lat_lng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates);
                 da.updateArtInfo({
                     art: feature.properties
                 });
+                if (da.selected_art_circle) {
+                    da.selected_art_circle.setLatLng(lat_lng);
+                } else {
+                    da.selected_art_circle = L.circleMarker(lat_lng, {
+                        radius: 8,
+                        fillColor: '#ff0000',
+                        fillOpacity: 0.4,
+                        color: '#ff0000',
+                        opacity: 1
+                    }).addTo(da.map);
+                }
             });
         }
     });
@@ -42,6 +54,10 @@ $(function() {
         da.updateArtInfo({
             art: null
         });
+        if (da.selected_art_circle && da.map.hasLayer(da.selected_art_circle)) {
+            da.map.removeLayer(da.selected_art_circle);
+        }
+        da.selected_art_circle = null;
     });
 
     da.updateArtInfo = function(context) {
