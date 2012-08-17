@@ -60,7 +60,8 @@ $(function() {
                 maxZoom: 17
             }),
             da.art_layer
-        ]
+        ],
+        attributionControl: false
     }).on('click', function(event) {
         da.updateArtInfo({
             art: null
@@ -156,4 +157,8 @@ $(function() {
     function locateError(error) {
         var foo = 'Ummmm, I\'m sorry?';
     }
+});
+
+Handlebars.registerHelper('format_distance', function (distance) {
+    return distance.toFixed(0);
 });
