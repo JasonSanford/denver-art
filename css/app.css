@@ -21,13 +21,13 @@ html, body {
 }
 
 #title {
-    -webkit-border-radius-bottom-right: 5px;
-    -moz-border-radius-bottomright: 5px;
-    border-bottom-right-radius: 5px;
-    -webkit-border-radius-bottom-left: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    border-bottom-left-radius: 5px;
-    width: 300px;
+    -webkit-border-radius-bottom-right: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
+    -webkit-border-radius-bottom-left: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    width: 250px;
     margin: 0 auto;
     padding: 5px;
     background-color: #525252;

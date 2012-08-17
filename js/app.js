@@ -61,7 +61,8 @@ $(function() {
             }),
             da.art_layer
         ],
-        attributionControl: false
+        attributionControl: false,
+        zoomControl: false
     }).on('click', function(event) {
         da.updateArtInfo({
             art: null
