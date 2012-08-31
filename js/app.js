@@ -1,21 +1,21 @@
-var da = window.da || {};
+(function() {
 
-da.location = {};
+    var da = window.da || {};
 
-da.arts = {};
+    da.location = {};
 
-da.fake_location = (function() {
-    // Since we only find art < 1km away, let's let users fake their location
-    if (window.location.href.indexOf('fake_location') > -1) {
-        return {
-            lat: 39.7477,
-            lng: -104.9866
-        };
-    }
-    return null;
-}());
+    da.arts = {};
 
-$(function() {
+    da.fake_location = (function() {
+        // Since we only find art < 1km away, let's let users fake their location
+        if (window.location.href.indexOf('fake_location') > -1) {
+            return {
+                lat: 39.7477,
+                lng: -104.9866
+            };
+        }
+        return null;
+    }());
 
     da.art_icon = L.icon({
         iconUrl: 'img/markers/pin.png',
@@ -158,7 +158,7 @@ $(function() {
     function locateError(error) {
         var foo = 'Ummmm, I\'m sorry?';
     }
-});
+}());
 
 Handlebars.registerHelper('format_distance', function (distance) {
     return distance.toFixed(0);
