@@ -54,7 +54,7 @@
         center: [39.7477, -104.9866],
         zoom: 14,
         layers: [
-            L.tileLayer('http://{s}.tiles.mapbox.com/v3/jcsanford.map-c7d5e9uz/{z}/{x}/{y}.png', {
+            L.tileLayer('http://{s}.tiles.mapbox.com/v3/jcsanford.map-xu5k4lii/{z}/{x}/{y}.png', {
                 subdomains: ['a', 'b', 'c', 'd'],
                 detectRetina: true,
                 maxZoom: 17
